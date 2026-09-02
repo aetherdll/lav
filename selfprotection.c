@@ -21,18 +21,19 @@ NTSTATUS SelfProtection_Initialize(VOID) {
     OB_CALLBACK_REGISTRATION obReg;
     OB_OPERATION_REGISTRATION opReg;
 
+    UNICODE_STRING altitudeString;
+    RtlInitUnicodeString(&altitudeString, L"321000");
+
     RtlZeroMemory(&obReg, sizeof(OB_CALLBACK_REGISTRATION));
     obReg.Version = OB_FLT_REGISTRATION_VERSION;
     obReg.OperationRegistrationCount = 1;
-    obReg.Altitude = RTL_CONSTANT_STRING(L"321000");
+    obReg.Altitude = altitudeString;
     
     RtlZeroMemory(&opReg, sizeof(OB_OPERATION_REGISTRATION));
     opReg.ObjectType = PsProcessType;
     opReg.Operations = OB_OPERATION_HANDLE_CREATE | OB_OPERATION_HANDLE_DUPLICATE;
     opReg.PreOperation = ObjectPreCallback;
     
-    obReg.OperationRegistration = &opReg;
-
     obReg.OperationRegistration = &opReg;
 
     NTSTATUS status = ObRegisterCallbacks(&obReg, &g_RegistrationHandle);
