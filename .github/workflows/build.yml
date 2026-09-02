@@ -13,21 +13,17 @@ jobs:
     - name: Check out repository
       uses: actions/checkout@v4
 
-    - name: Install MinGW-w64 Compiler & Git
+    - name: Install MinGW-w64 Compiler
       run: |
         sudo apt-get update
-        sudo apt-get install -y mingw-w64 git
-
-    - name: Download Windows Driver Kit Headers (WDK)
-      run: |
-        git clone https://github.com/tpn/winsdk-10.git /tmp/winsdk --depth 1
+        sudo apt-get install -y mingw-w64
 
     - name: Compile lavsys.sys (x86_64)
       run: |
         x86_64-w64-mingw32-gcc -std=c99 -Wall -m64 -shared \
             -nostdlib -nostartfiles \
-            -I/tmp/winsdk/Include/10.0.18362.0/km \
-            -I/tmp/winsdk/Include/10.0.18362.0/shared \
+            -I/usr/x86_64-w64-mingw32/include/ddk \
+            -I/usr/x86_64-w64-mingw32/include/wine/drivers \
             -Wl,--subsystem,native \
             -Wl,--entry,DriverEntry \
             -Wl,--image-base,0x10000 \
