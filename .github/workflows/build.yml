@@ -13,18 +13,21 @@ jobs:
     - name: Check out repository
       uses: actions/checkout@v4
 
-    - name: Install MinGW-w64 Compiler
+    - name: Install MinGW-w64 Compiler & Git
       run: |
         sudo apt-get update
-        sudo apt-get install -y mingw-w64
+        sudo apt-get install -y mingw-w64 git
+
+    - name: Download Wine/ReactOS Headers for DDK
+      run: |
+        git clone https://github.com/reactos/reactos.git /tmp/reactos --depth 1
 
     - name: Compile lavsys.sys (x86_64)
       run: |
         x86_64-w64-mingw32-gcc -std=c99 -Wall -m64 -shared \
             -nostdlib -nostartfiles \
-            -I/usr/x86_64-w64-mingw32/include/ddk \
-            -I/usr/x86_64-w64-mingw32/include/wine/drivers \
-            -I/usr/x86_64-w64-mingw32/include/wine \
+            -I/tmp/reactos/sdk/include/ddk \
+            -I/tmp/reactos/sdk/include/psdk \
             -Wl,--subsystem,native \
             -Wl,--entry,DriverEntry \
             -Wl,--image-base,0x10000 \
