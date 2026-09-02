@@ -24,6 +24,7 @@ jobs:
             -nostdlib -nostartfiles \
             -I/usr/x86_64-w64-mingw32/include/ddk \
             -I/usr/x86_64-w64-mingw32/include/wine/drivers \
+            -I/usr/x86_64-w64-mingw32/include/wine \
             -Wl,--subsystem,native \
             -Wl,--entry,DriverEntry \
             -Wl,--image-base,0x10000 \
