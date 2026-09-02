@@ -20,8 +20,6 @@ jobs:
 
     - name: Download Windows Driver Kit Headers (WDK)
       run: |
-        git clone https://github.com/wine-staging/wine-staging.git /tmp/wine --depth 1
-        # Veya Microsoft WDK header'larını sağlayan temiz bir repo kullanalım:
         git clone https://github.com/tpn/winsdk-10.git /tmp/winsdk --depth 1
 
     - name: Compile lavsys.sys (x86_64)
