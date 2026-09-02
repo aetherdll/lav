@@ -1,0 +1,47 @@
+name: Build LAV Kernel Driver
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v4
+
+    - name: Install MinGW-w64 Compiler & Git
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y mingw-w64 git
+
+    - name: Download Windows Driver Kit Headers (WDK)
+      run: |
+        git clone https://github.com/wine-staging/wine-staging.git /tmp/wine --depth 1
+        # Veya Microsoft WDK header'larını sağlayan temiz bir repo kullanalım:
+        git clone https://github.com/tpn/winsdk-10.git /tmp/winsdk --depth 1
+
+    - name: Compile lavsys.sys (x86_64)
+      run: |
+        x86_64-w64-mingw32-gcc -std=c99 -Wall -m64 -shared \
+            -nostdlib -nostartfiles \
+            -I/tmp/winsdk/Include/10.0.18362.0/km \
+            -I/tmp/winsdk/Include/10.0.18362.0/shared \
+            -Wl,--subsystem,native \
+            -Wl,--entry,DriverEntry \
+            -Wl,--image-base,0x10000 \
+            -Wl,--file-alignment,0x1000 \
+            -Wl,--section-alignment,0x1000 \
+            -Wl,--nxcompat \
+            -Wl,--dynamicbase \
+            *.c -o lavsys.sys \
+            -lntoskrnl -lhal -lfltMgr
+
+    - name: Upload Built Driver Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: lavsys-driver
+        path: lavsys.sys
