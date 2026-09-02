@@ -1,11 +1,18 @@
 #!/bin/bash
+set -e  # Hata alırsan hemen dur
+
+echo "1. fltKernel.h aranıyor..."
 FLT_PATH=$(find /usr -name "fltKernel.h" -print -quit 2>/dev/null || echo "")
 FLT_INCLUDE=""
 if [ -n "$FLT_PATH" ]; then
     FLT_DIR=$(dirname "$FLT_PATH")
     FLT_INCLUDE="-I$FLT_DIR"
+    echo "Bulundu: $FLT_DIR"
+else
+    echo "Uyarı: fltKernel.h bulunamadı!"
 fi
 
+echo "2. Derleme başlatılıyor..."
 x86_64-w64-mingw32-gcc -std=c99 -Wall -m64 -shared \
     -nostdlib -nostartfiles \
     -I/usr/x86_64-w64-mingw32/include/ddk \
@@ -20,4 +27,4 @@ x86_64-w64-mingw32-gcc -std=c99 -Wall -m64 -shared \
     *.c -o lavsys.sys \
     -lntoskrnl -lhal -lfltMgr
 
-echo "Derleme tamamlandı: lavsys.sys hazır!"
+echo "Derleme başarıyla tamamlandı: lavsys.sys hazır!"
