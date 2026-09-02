@@ -1,0 +1,23 @@
+#!/bin/bash
+FLT_PATH=$(find /usr -name "fltKernel.h" -print -quit 2>/dev/null || echo "")
+FLT_INCLUDE=""
+if [ -n "$FLT_PATH" ]; then
+    FLT_DIR=$(dirname "$FLT_PATH")
+    FLT_INCLUDE="-I$FLT_DIR"
+fi
+
+x86_64-w64-mingw32-gcc -std=c99 -Wall -m64 -shared \
+    -nostdlib -nostartfiles \
+    -I/usr/x86_64-w64-mingw32/include/ddk \
+    $FLT_INCLUDE \
+    -Wl,--subsystem,native \
+    -Wl,--entry,DriverEntry \
+    -Wl,--image-base,0x10000 \
+    -Wl,--file-alignment,0x1000 \
+    -Wl,--section-alignment,0x1000 \
+    -Wl,--nxcompat \
+    -Wl,--dynamicbase \
+    *.c -o lavsys.sys \
+    -lntoskrnl -lhal -lfltMgr
+
+echo "Derleme tamamlandı: lavsys.sys hazır!"
